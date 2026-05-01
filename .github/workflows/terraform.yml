@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+# Authenticate to Google Cloud using the service account key stored in GitHub Secrets
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:

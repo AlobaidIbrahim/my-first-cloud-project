@@ -5,7 +5,10 @@ on:
     branches:
       - main
   pull_request:
-
+    branches:
+      - main
+# this workflow will run terraform plan on pull requests and terraform apply on pushes to the main branch
+# this triggers the following workflow, which will run terraform plan and apply on the main branch, but only if the previous workflow succeeded
 jobs:
   terraform:
     runs-on: ubuntu-latest

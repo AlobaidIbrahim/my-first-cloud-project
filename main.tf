@@ -3,9 +3,9 @@ provider "google" {
   region  = var.region
   zone    = var.zone
 }
-
+// Get the default Compute Engine service account for the project
 data "google_compute_default_service_account" "default" {}
-
+// Grant the Compute Engine default service account permissions to publish and subscribe to Pub/Sub
 resource "google_project_iam_member" "pubsub_publisher" {
   project = var.project_id
   role    = "roles/pubsub.publisher"

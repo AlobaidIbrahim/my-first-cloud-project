@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "apps/**"
+      - ".github/workflows/deploy-apps.yml"
 
 jobs:
   deploy:
@@ -25,22 +26,22 @@ jobs:
 
       - name: Deploy publisher app
         run: |
-          gcloud compute scp --recurse apps/Publisher publisher-vm:/tmp/publisher-app \
+          gcloud compute scp --recurse apps/publisher publisher-vm:/tmp/publisher-app \
             --zone=me-central1-a \
             --project=${{ secrets.GCP_PROJECT_ID }}
 
           gcloud compute ssh publisher-vm \
             --zone=me-central1-a \
             --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="sudo rm -rf /opt/publisher-app/* && sudo cp -r /tmp/publisher-app/* /opt/publisher-app/ && cd /opt/publisher-app && sudo ./venv/bin/pip install -r requirements.txt && sudo systemctl restart publisher-app"
+            --command="sudo rm -rf /opt/publisher-app && sudo cp -r /tmp/publisher-app /opt/publisher-app && cd /opt/publisher-app && sudo python3 -m venv venv && sudo ./venv/bin/pip install -r requirements.txt && sudo systemctl restart publisher-app"
 
       - name: Deploy receiver app
         run: |
-          gcloud compute scp --recurse apps/Subscriber receiver-vm:/tmp/receiver-app \
+          gcloud compute scp --recurse apps/receiver receiver-vm:/tmp/receiver-app \
             --zone=me-central1-a \
             --project=${{ secrets.GCP_PROJECT_ID }}
 
           gcloud compute ssh receiver-vm \
             --zone=me-central1-a \
             --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="sudo rm -rf /opt/receiver-app/* && sudo cp -r /tmp/receiver-app/* /opt/receiver-app/ && cd /opt/receiver-app && sudo ./venv/bin/pip install -r requirements.txt && sudo systemctl restart receiver-app"
+            --command="sudo rm -rf /opt/receiver-app && sudo cp -r /tmp/receiver-app /opt/receiver-app && cd /opt/receiver-app && sudo python3 -m venv venv && sudo ./venv/bin/pip install -r requirements.txt && sudo systemctl restart receiver-app"

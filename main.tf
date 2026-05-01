@@ -37,7 +37,7 @@ resource "google_compute_instance" "publisher_vm" {
       image = "debian-cloud/debian-12"
     }
   }
-
+// Configure the VM to have external internet access
   network_interface {
     network = "default"
     access_config {}

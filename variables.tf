@@ -10,7 +10,6 @@ variable "region" {
 }
 
 variable "zone" {
-  description = "The GCP zone"
-  type        = string
-  default     = "me-central2-a"
+  type    = string
+  default = "us-central1-a"
 }

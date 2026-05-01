@@ -7,7 +7,6 @@
 # Secret variable files (where you store actual passwords/IDs)
 *.tfvars
 *.tfvars.json
-variables.tf
 # Environment variables
 .env
 

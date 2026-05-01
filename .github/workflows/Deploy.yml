@@ -26,7 +26,7 @@ jobs:
 
       - name: Deploy publisher app
         run: |
-          gcloud compute scp --recurse apps/publisher publisher-vm:/tmp/publisher-app \
+          gcloud compute scp --recurse apps/Publisher publisher-vm:/tmp/publisher-app \
             --zone=me-central1-a \
             --project=${{ secrets.GCP_PROJECT_ID }}
 
@@ -37,7 +37,7 @@ jobs:
 
       - name: Deploy receiver app
         run: |
-          gcloud compute scp --recurse apps/receiver receiver-vm:/tmp/receiver-app \
+          gcloud compute scp --recurse apps/Subscriber receiver-vm:/tmp/receiver-app \
             --zone=me-central1-a \
             --project=${{ secrets.GCP_PROJECT_ID }}
 

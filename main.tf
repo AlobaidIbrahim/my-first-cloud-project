@@ -47,7 +47,7 @@ resource "google_compute_instance" "publisher_vm" {
     email  = data.google_compute_default_service_account.default.email
     scopes = ["cloud-platform"]
   }
-
+// Startup script to publish messages to Pub/Sub every 30 seconds
   metadata_startup_script = <<-EOF
     #!/bin/bash
     echo "Publisher VM started"

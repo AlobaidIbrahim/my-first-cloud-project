@@ -1,3 +1,4 @@
+// Output the names of the created resources for easy reference
 output "publisher_vm_name" {
   value = google_compute_instance.publisher_vm.name
 }

@@ -37,7 +37,7 @@ resource "google_compute_instance" "publisher_vm" {
       image = "debian-cloud/debian-12"
     }
   }
-// Configure the VM to have external internet access
+  // Configure the VM to have external internet access
   network_interface {
     network = "default"
     access_config {}
@@ -47,7 +47,7 @@ resource "google_compute_instance" "publisher_vm" {
     email  = data.google_compute_default_service_account.default.email
     scopes = ["cloud-platform"]
   }
-// Startup script to publish messages to Pub/Sub every 30 seconds
+  // Startup script to publish messages to Pub/Sub every 30 seconds
   metadata_startup_script = <<-EOF
     #!/bin/bash
     echo "Publisher VM started"

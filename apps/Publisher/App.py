@@ -22,6 +22,7 @@ def home():
             publisher.publish(topic_path, message.encode("utf-8"))
             status = f"Published: {message}"
 # the below line is for rendering the template with the status message, it will show the status of the published message on the webpage
+# index.html will be the template file that will be rendered, it should be located in the templates folder of the app directory because Flask looks for templates in the templates folder by default
     return render_template("index.html", status=status)
 
 

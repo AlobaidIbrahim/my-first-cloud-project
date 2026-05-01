@@ -1,9 +1,8 @@
 name: Terraform GCP
 
 on:
-  push:
+  workflow_dispatch:
     branches: [ main ]
-  pull_request:
 
 jobs:
   terraform:

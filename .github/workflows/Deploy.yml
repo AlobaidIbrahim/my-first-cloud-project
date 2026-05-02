@@ -1,17 +1,18 @@
 name: Deploy Apps
 
 on:
-  workflow_dispatch:
+  push:
     branches:
       - main
     paths:
       - "apps/**"
       - ".github/workflows/Deploy.yml"
+  workflow_dispatch:
 
 env:
   GCP_ZONE: me-central1-a
   GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-  REGISTRY: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo
+  REGISTRY: me-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo
 
 jobs:
   build:
@@ -38,8 +39,8 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Configure Docker auth
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+      - name: Configure Docker auth for Artifact Registry
+        run: gcloud auth configure-docker me-central1-docker.pkg.dev --quiet
 
       - name: Build Docker image
         run: |
@@ -75,14 +76,14 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Pull and restart container
+      - name: Pull image and restart container
         run: |
           gcloud compute ssh ${{ matrix.vm }} \
             --zone=${{ env.GCP_ZONE }} \
             --project=${{ env.GCP_PROJECT }} \
             --ssh-flag="-o StrictHostKeyChecking=no" \
             --command="
-              sudo gcloud auth configure-docker us-central1-docker.pkg.dev --quiet &&
+              sudo gcloud auth configure-docker me-central1-docker.pkg.dev --quiet &&
               sudo docker pull ${{ env.REGISTRY }}/${{ matrix.app }}:${{ github.sha }} &&
               sudo docker rm -f ${{ matrix.app }} 2>/dev/null || true &&
               sudo docker run -d \
@@ -92,7 +93,7 @@ jobs:
                 ${{ env.REGISTRY }}/${{ matrix.app }}:${{ github.sha }}
             "
 
-      - name: Verify container
+      - name: Verify container is running
         run: |
           gcloud compute ssh ${{ matrix.vm }} \
             --zone=${{ env.GCP_ZONE }} \

@@ -54,7 +54,6 @@ resource "google_compute_instance" "publisher_vm" {
 
   network_interface {
     network = "default"
-
     access_config {}
   }
 
@@ -65,54 +64,10 @@ resource "google_compute_instance" "publisher_vm" {
 
   metadata_startup_script = <<-EOF
     #!/bin/bash
-
     apt-get update
-    apt-get install -y python3 python3-pip python3-venv git
-
-    mkdir -p /opt/publisher-app
-    cd /opt/publisher-app
-
-    python3 -m venv venv
-
-    cat > requirements.txt <<REQ
-    flask
-    google-cloud-pubsub
-    gunicorn
-    REQ
-
-    ./venv/bin/pip install -r requirements.txt
-
-    cat > app.py <<APP
-    from flask import Flask
-
-    app = Flask(__name__)
-
-    @app.route("/")
-    def home():
-        return "Publisher app placeholder. Deploy real app from GitHub."
-
-    if __name__ == "__main__":
-        app.run(host="0.0.0.0", port=80)
-    APP
-
-    cat > /etc/systemd/system/publisher-app.service <<SERVICE
-    [Unit]
-    Description=Publisher Flask App
-    After=network.target
-
-    [Service]
-    WorkingDirectory=/opt/publisher-app
-    ExecStart=/opt/publisher-app/venv/bin/gunicorn --bind 0.0.0.0:80 app:app
-    Restart=always
-    User=root
-
-    [Install]
-    WantedBy=multi-user.target
-    SERVICE
-
-    systemctl daemon-reload
-    systemctl enable publisher-app
-    systemctl restart publisher-app
+    apt-get install -y docker.io
+    systemctl enable docker
+    systemctl start docker
   EOF
 
   depends_on = [
@@ -136,7 +91,6 @@ resource "google_compute_instance" "receiver_vm" {
 
   network_interface {
     network = "default"
-
     access_config {}
   }
 
@@ -147,54 +101,10 @@ resource "google_compute_instance" "receiver_vm" {
 
   metadata_startup_script = <<-EOF
     #!/bin/bash
-
     apt-get update
-    apt-get install -y python3 python3-pip python3-venv git
-
-    mkdir -p /opt/receiver-app
-    cd /opt/receiver-app
-
-    python3 -m venv venv
-
-    cat > requirements.txt <<REQ
-    flask
-    google-cloud-pubsub
-    gunicorn
-    REQ
-
-    ./venv/bin/pip install -r requirements.txt
-
-    cat > app.py <<APP
-    from flask import Flask
-
-    app = Flask(__name__)
-
-    @app.route("/")
-    def home():
-        return "Receiver app placeholder. Deploy real app from GitHub."
-
-    if __name__ == "__main__":
-        app.run(host="0.0.0.0", port=80)
-    APP
-
-    cat > /etc/systemd/system/receiver-app.service <<SERVICE
-    [Unit]
-    Description=Receiver Flask App
-    After=network.target
-
-    [Service]
-    WorkingDirectory=/opt/receiver-app
-    ExecStart=/opt/receiver-app/venv/bin/gunicorn --bind 0.0.0.0:80 app:app
-    Restart=always
-    User=root
-
-    [Install]
-    WantedBy=multi-user.target
-    SERVICE
-
-    systemctl daemon-reload
-    systemctl enable receiver-app
-    systemctl restart receiver-app
+    apt-get install -y docker.io
+    systemctl enable docker
+    systemctl start docker
   EOF
 
   depends_on = [

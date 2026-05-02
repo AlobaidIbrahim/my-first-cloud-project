@@ -1,58 +1,26 @@
-name: Deploy Apps
+name: Terraform Destroy
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "apps/**"
-      - ".github/workflows/Deploy.yml"
   workflow_dispatch:
 
 jobs:
-  deploy:
+  destroy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Authenticate to GCP
+      - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-      - name: Deploy publisher app
-        run: |
-          gcloud compute ssh publisher-vm \
-            --zone=me-central1-a \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="sudo bash -lc 'apt-get update && apt-get install -y docker.io && systemctl enable docker && systemctl start docker && rm -rf /tmp/publisher-app /opt/publisher-app'"
+      - name: Terraform Init
+        run: terraform init
 
-          gcloud compute scp --recurse apps/Publisher publisher-vm:/tmp/publisher-app \
-            --zone=me-central1-a \
-            --project=${{ secrets.GCP_PROJECT_ID }}
-
-          gcloud compute ssh publisher-vm \
-            --zone=me-central1-a \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="sudo bash -lc 'cp -r /tmp/publisher-app /opt/publisher-app && cd /opt/publisher-app && docker build -t publisher-app . && docker rm -f publisher-app || true; docker run -d --name publisher-app -p 80:80 publisher-app'"
-
-      - name: Deploy subscriber app
-        run: |
-          gcloud compute ssh receiver-vm \
-            --zone=me-central1-a \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="sudo bash -lc 'apt-get update && apt-get install -y docker.io && systemctl enable docker && systemctl start docker && rm -rf /tmp/subscriber-app /opt/subscriber-app'"
-
-          gcloud compute scp --recurse apps/Subscriber receiver-vm:/tmp/subscriber-app \
-            --zone=me-central1-a \
-            --project=${{ secrets.GCP_PROJECT_ID }}
-
-          gcloud compute ssh receiver-vm \
-            --zone=me-central1-a \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --command="sudo bash -lc 'cp -r /tmp/subscriber-app /opt/subscriber-app && cd /opt/subscriber-app && docker build -t subscriber-app . && docker rm -f subscriber-app || true; docker run -d --name subscriber-app -p 80:80 subscriber-app'"
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}"
